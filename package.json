@@ -1,6 +1,6 @@
 {
   "name": "autofile-cp",
-  "version": "0.0.1",
+  "version": "0.0.0",
   "description": "Copy a file or set of files.",
   "main": "autofile.js",
   "scripts": {
