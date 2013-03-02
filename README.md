@@ -1,13 +1,10 @@
+Copy a file or set of files.
+
+*Indigo United*
+
 `automaton task` - http://indigounited.com/automaton
 
-cp
-===
-
-Copy file/directory or set of files/directories.
-
-*Indigo United 2013*
-
-----------------------------------------
+--------------------------------------------------------------------------------
 
 ## Introduction
 
@@ -25,10 +22,11 @@ A concise description of how to use the task. If the task can accomplish a lot, 
 
 ### Options
 
-A list of the options that the task can get, and what they are for:
+Here's a list of the options that this task can take:
 
-- `option1`: This is option1!
-- `another_option`: This is another option.
+- `*files`: Which files should be copied. Accepts an object in which keys are the source files and values the destination. Source values support minimatch.
+- `glob` *(null)*: The options to pass to glob (check https://npmjs.org/package/glob for details).
+
 
 ### Example
 
