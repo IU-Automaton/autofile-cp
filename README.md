@@ -1,4 +1,6 @@
-Copy a file or set of files.
+# Copy (copy)
+
+Copy files and folders.
 
 *Indigo United*
 

@@ -11,7 +11,7 @@ module.exports = function (task) {
     task
     .id('cp')
     .name('Copy')
-    .description('Copy a file or set of files.')
+    .description('Copy files and folders.')
     .author('Indigo United')
 
     .option('files', 'Which files should be copied. Accepts an object in which keys are the source files and values the destination. Source values support minimatch.')
