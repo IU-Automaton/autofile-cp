@@ -1,9 +1,9 @@
 `automaton task` - http://indigounited.com/automaton
 
-rm
+cp
 ===
 
-Remove file or set of files.
+Copy file/directory or set of files/directories.
 
 *Indigo United 2013*
 

@@ -1,5 +1,3 @@
-/*jshint es5:true*/
-
 'use strict';
 
 var fstream = require('fstream');
@@ -7,63 +5,53 @@ var glob    = require('glob');
 var async   = require('async');
 var path    = require('path');
 var fs      = require('fs');
-var utils   = require('mout');
 var mkdirp  = require('mkdirp');
 
-var task = {
-    id          : 'cp',
-    author      : 'Indigo United',
-    name        : 'Copy',
-    description : 'Copy a file or set of files.',
-    options: {
-        files: {
-            description: 'Which files should be copied. Accepts an object in which keys are the source files and values the destination. Source values support minimatch.'
-        },
-        glob: {
-            description: 'The options to pass to glob (check https://npmjs.org/package/glob for details).',
-            default: null
-        }
-    },
-    tasks:
-    [
-        {
-            task: function (opt, ctx, next) {
-                opt.glob = opt.glob || {};
-                var sources = Object.keys(opt.files);
-                var error;
+module.exports = function (task) {
+    task
+    .id('cp')
+    .name('Copy')
+    .description('Copy a file or set of files.')
+    .author('Indigo United')
 
-                // Cycle through each source
-                // Note that series is used to avoid conflicts between each pattern
-                async.forEachSeries(sources, function (pattern, next) {
-                    var dsts = utils.lang.isArray(opt.files[pattern]) ? opt.files[pattern] : [opt.files[pattern]];
-                    dsts = utils.array.unique(dsts.map(function (dst) { return path.normalize(dst); }));
-                    pattern = path.normalize(pattern);
+    .option('files', 'Which files should be copied. Accepts an object in which keys are the source files and values the destination. Source values support minimatch.')
+    .option('glob', 'The options to pass to glob (check https://npmjs.org/package/glob for details).', null)
 
-                    // Expand the files to get an array of files and directories
-                    expand(pattern, opt.glob, function (err, files, dirs, directMatch) {
-                        if (err) {
-                            return next(err);
-                        }
+    .do(function (opt, ctx, next) {
+        opt.glob = opt.glob || {};
+        var sources = Object.keys(opt.files);
+        var error;
 
-                        if (!files.length && !dirs.length) {
-                            error = new Error('ENOENT, no such file or directory \'' + pattern + '\'');
-                            error.code = 'ENOENT';
-                            return next(error);
-                        }
+        // Cycle through each source
+        // Note that series is used to avoid conflicts between each pattern
+        async.forEachSeries(sources, function (pattern, next) {
+            var dsts = Array.isArray(opt.files[pattern]) ? opt.files[pattern] : [opt.files[pattern]];
+            dsts = dsts.map(function (dst) { return path.normalize(dst); });
+            pattern = path.normalize(pattern);
 
-                        // Process the matches for each dst
-                        async.forEach(dsts, function (dst, next) {
-                            if (directMatch) {
-                                processDirectMatch(files, dirs, dst, ctx, next);
-                            } else {
-                                processPatternMatch(pattern, files, dirs, dst, ctx, next);
-                            }
-                        }, next);
-                    });
+            // Expand the files to get an array of files and directories
+            expand(pattern, opt.glob, function (err, files, dirs, directMatch) {
+                if (err) {
+                    return next(err);
+                }
+
+                if (!files.length && !dirs.length) {
+                    error = new Error('ENOENT, no such file or directory \'' + pattern + '\'');
+                    error.code = 'ENOENT';
+                    return next(error);
+                }
+
+                // Process the matches for each dst
+                async.forEach(dsts, function (dst, next) {
+                    if (directMatch) {
+                        processDirectMatch(files, dirs, dst, ctx, next);
+                    } else {
+                        processPatternMatch(pattern, files, dirs, dst, ctx, next);
+                    }
                 }, next);
-            }
-        }
-    ]
+            });
+        }, next);
+    });
 };
 
 /**
@@ -115,7 +103,7 @@ function processDirectMatch(files, dirs, dst, ctx, next) {
 
                 mkdirp(dst, function (err) {
                     if (err) {
-                        return err;
+                        return next(err);
                     }
 
                     copyDir(src, dst, ctx, next);
@@ -127,7 +115,7 @@ function processDirectMatch(files, dirs, dst, ctx, next) {
                 if (!stat) {
                     fs.mkdir(dst, function (err) {
                         if (err) {
-                            return err;
+                            return next(err);
                         }
 
                         dst = path.join(dst, path.basename(src));
@@ -169,7 +157,7 @@ function processPatternMatch(pattern, files, dirs, dst, ctx, next) {
         });
     }, function (err) {
         if (err) {
-            throw err;
+            return next(err);
         }
 
         async.forEachLimit(dirs, 30, function (dir, next) {
@@ -228,7 +216,10 @@ function copyDir(src, dst, ctx, next) {
         );
 
     stream
-        .on('close', next)
+        .on('close', function () {
+            stream.removeAllListeners();
+            next();
+        })
         .on('error', function (err) {
             stream.removeAllListeners();
             next(err);
@@ -342,5 +333,3 @@ function relativePath(file, pattern) {
 
     return path.basename(file);
 }
-
-module.exports = task;
