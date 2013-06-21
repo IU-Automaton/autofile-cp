@@ -1,11 +1,6 @@
 {
     "predef": [
-        "describe",
-        "it",
-        "before",
-        "beforeEach",
-        "after",
-        "afterEach"
+        "console"
     ],
 
     "node": true,
@@ -53,7 +48,7 @@
     "sub": false,
     "supernew": false,
     "validthis": false,
-
+    "es5": true,
     "nomen": false,
     "onevar": false,
     "white": true

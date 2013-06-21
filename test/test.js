@@ -1,13 +1,14 @@
+/*global describe, it, beforeEach, after*/
+
 'use strict';
 
-var expect    = require('expect.js'),
-    isFile    = require('./util/is-file'),
-    isDir     = require('./util/is-dir'),
-    rimraf    = require('rimraf'),
-    fs        = require('fs'),
-    automaton = require('automaton').create(),
-    cp        = require('../autofile')
-;
+var expect    = require('expect.js');
+var isFile    = require('./util/isFile');
+var isDir     = require('./util/isDir');
+var rimraf    = require('rimraf');
+var fs        = require('fs');
+var automaton = require('automaton').create();
+var cp        = require('../autofile');
 
 describe('cp', function () {
     var tmp = __dirname + '/tmp';
