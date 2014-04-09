@@ -1,6 +1,6 @@
 {
   "name": "autofile-cp",
-  "version": "0.0.0",
+  "version": "0.0.1",
   "description": "Copy files and folders.",
   "main": "autofile.js",
   "scripts": {
@@ -25,7 +25,8 @@
     "glob": "~3.2.1",
     "mkdirp": "~0.3.5",
     "async": "~0.2.5",
-    "fstream": "~0.1.22"
+    "fstream": "~0.1.22",
+    "cpr": "^0.1.1"
   },
   "devDependencies": {
     "automaton": "~0.2.0",
