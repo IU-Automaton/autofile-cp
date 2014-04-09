@@ -205,7 +205,47 @@ function copyFile(src, dst, ctx, next) {
 function copyDir(src, dst, ctx, next) {
     ctx.log.debugln('Copying directory ' + src + ' to ' + dst);
 
-    cpr(src, dst, next);
+    async.parallel([
+        // Copy files
+        function (callback) {
+            cpr(src, dst, function (err) {
+                if (!err) {
+                    return callback();
+                }
+
+                // Errors coming from cpr are very odd,
+                // see: https://github.com/davglass/cpr/issues/5
+                if (err instanceof Error) {
+                    return callback(err);
+                }
+
+                // It can be an array of errors, so we extract only 1
+                if (Array.isArray(err)) {
+                    err = err[0];
+                }
+
+                // It can actually be a string, so we convert to an error instance
+                if (typeof err === 'string') {
+                    err = new Error(err);
+                }
+
+                // Ignore the "no files to copy error"
+                if (/no files to copy/i.test(err.message)) {
+                    return callback();
+                }
+
+                callback(err);
+            });
+        },
+        // Ensure empty directories
+        function (callback) {
+            expand(src + '/**/*', {}, function (err, files, dirs) {
+                async.map(dirs, function (dir, callback) {
+                    mkdirp(dir, callback);
+                }, callback);
+            });
+        }
+    ], next);
 }
 
 /**
@@ -273,10 +313,12 @@ function expand(pattern, options, next) {
  * @param {Array} dirs  The array of dirs
  */
 function cleanup(files, dirs) {
-    var x, y;
+    var x, y,
+        nrDirs;
 
     // Cleanup dirs that overlap files
-    for (x = 0; x < dirs.length; ++x) {
+    nrDirs = dirs.length;
+    for (x = 0; x < nrDirs; ++x) {
         for (y = files.length - 1; y >= 0; --y) {
             if (files[y].indexOf(dirs[x]) === 0) {
                 dirs.splice(x, 1);

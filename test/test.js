@@ -198,8 +198,8 @@ describe('cp', function () {
         });
     });
 
-    it('should copy files and folders recursivelly - source/**/*', function (done) {
-        // test if files and folders are recursivelly copied with source/**/*
+    it('should copy files and folders recursively - source/**/*', function (done) {
+        // test if files and folders are recursively copied with source/**/*
         var files  = {},
             src    = '../cp_double_star/',
             dst    = 'dst/',
