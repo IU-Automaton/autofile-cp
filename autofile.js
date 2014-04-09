@@ -1,11 +1,11 @@
 'use strict';
 
-var fstream = require('fstream');
-var glob    = require('glob');
-var async   = require('async');
-var path    = require('path');
-var fs      = require('fs');
-var mkdirp  = require('mkdirp');
+var cpr    = require('cpr');
+var glob   = require('glob');
+var async  = require('async');
+var path   = require('path');
+var fs     = require('fs');
+var mkdirp = require('mkdirp');
 
 module.exports = function (task) {
     task
@@ -205,25 +205,7 @@ function copyFile(src, dst, ctx, next) {
 function copyDir(src, dst, ctx, next) {
     ctx.log.debugln('Copying directory ' + src + ' to ' + dst);
 
-    var stream = fstream.Reader({
-            path: src,
-            follow: true
-        }).pipe(
-            fstream.Writer({
-                type: 'Directory',
-                path: dst
-            })
-        );
-
-    stream
-        .on('close', function () {
-            stream.removeAllListeners();
-            next();
-        })
-        .on('error', function (err) {
-            stream.removeAllListeners();
-            next(err);
-        });
+    cpr(src, dst, next);
 }
 
 /**
