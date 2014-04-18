@@ -239,9 +239,9 @@ function copyDir(src, dst, ctx, next) {
         },
         // Ensure empty directories
         function (callback) {
-            expand(src + '/**/*', {}, function (err, files, dirs) {
-                async.map(dirs, function (dir, callback) {
-                    mkdirp(dir, callback);
+            expand('**/*', { cwd: src }, function (err, files, dirs) {
+                async.map(dirs, function (dir, cb) {
+                    mkdirp(path.join(dst, dir), cb);
                 }, callback);
             });
         }
