@@ -69,8 +69,8 @@ function processDirectMatch(files, dirs, dst, ctx, next) {
     var dstType;
     var error;
 
-    // Check if dirname of the dst exists
-    fs.stat(path.dirname(dst), function (err) {
+    // Ensure dirname of the dst exists
+    mkdirp(path.dirname(dst), function (err) {
         if (err) {
             return next(err);
         }

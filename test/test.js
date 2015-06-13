@@ -33,6 +33,7 @@ describe('cp', function () {
 
     it('should copy file to file', function (done) {
         var files = {};
+
         files[__dirname + '/assets/file1.json'] = target + 'file1.json';
         files[__dirname + '/assets/file2'] = target;
 
@@ -45,6 +46,23 @@ describe('cp', function () {
 
             expect(isFile(target + 'file1.json')).to.be(true);
             expect(isFile(target + 'file2')).to.be(true);
+            done();
+        });
+    });
+
+    it('should copy file to file (deeply)', function (done) {
+        var files       = {};
+
+        files[__dirname + '/assets/file1.json'] = target + 'foo/file1.json';
+
+        automaton.run(cp, {
+            files: files
+        }, function (err) {
+            if (err) {
+                throw err;
+            }
+
+            expect(isFile(target + 'foo/file1.json')).to.be(true);
             done();
         });
     });
